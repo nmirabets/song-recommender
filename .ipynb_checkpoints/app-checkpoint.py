@@ -68,17 +68,13 @@ def main():
     #'st.session_state object:', st.session_state
 
     # Application Title
-    st.title('Song Recommender')
-    st.caption('Beta')
+    st.image('./resources/gnod_logo.png', width=150)
+    st.header('MelodyMind')
+    st.caption('Song Recommender Beta 1.0')
 
     st.divider()
     
-    st.select_slider('Select a range of popularity',
-                                          options=['Hidden Gem', 'Underrated', 'Trending', 'Popular', 'Super hit'],
-                                          value=('Hidden Gem', 'Super hit'),
-                                         on_change=update_popularity,
-                                         key='pop_slider')
-    st.divider()
+
     
     # Page rendering
     if st.session_state['current_page'] == 1:
@@ -128,17 +124,24 @@ def main():
                     st.info('No songs found.')
 
     elif st.session_state['current_page'] == 2:
+        st.select_slider('Select a range of popularity',
+                                          options=['Hidden Gem', 'Underrated', 'Trending', 'Popular', 'Super hit'],
+                                          value=('Hidden Gem', 'Super hit'),
+                                         on_change=update_popularity,
+                                         key='pop_slider')
         
-        
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         with col1:
-            st.subheader('You will also like...')
-        with col2:
             st.button('Recommend again', on_click=option_song_clicked)
-        with col3:
+            
+        with col2:
             st.button('Start again', on_click=start_again)
+            
         st.divider()
         
+        st.subheader('You will also like...')
+        
+        st.divider()
         recommended_songs = st.session_state['recommended_songs']
         if len(recommended_songs) == 0:
             st.info('No recommendations available. Consider widening the popularity filter.')
