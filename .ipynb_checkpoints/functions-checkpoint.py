@@ -5,8 +5,6 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from IPython.display import clear_output
 
-from credentials import *
-
 def read_pickle_file(path: str):
     '''
 
@@ -42,8 +40,7 @@ def search_song(title: str, artist: str) -> list:
     '''
     
     # Initialize SpotiPy with user credentias
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=st.secrets(["Client_ID"]),
-                                                           client_secret=st.secrets(["Client_Secret"]))
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=st.secrets["Client_ID"], client_secret=st.secrets["Client_Secret"]))
 
     # Create the query string
     query = ("track:"+title if title != "" else "")+" "+("artist:"+artist if artist != "" else "")
@@ -102,8 +99,7 @@ def get_audio_features(track_ids: list) -> pd.DataFrame:
     loop_count = 50 # tracks per sleep loop
     
     # Initialize SpotiPy with user credentias
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=st.secrets(["Client_ID"]),
-                                                           client_secret=st.secrets(["Client_Secret"]))
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=st.secrets["Client_ID"], client_secret=st.secrets["Client_Secret"]))
 
     # Define result variable
     clean_results = []

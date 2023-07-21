@@ -1,0 +1,2 @@
+Client_ID = "cb7c96107e1d40249d0c4c7595694ae4"
+Client_Secret = "3b06dc307c5841088e6bb4b030930793"
