@@ -22,7 +22,7 @@ To enhance the recommendation process, song data is enriched with additional fea
 
 The Song Recommender web application is deployed using Streamlit. Streamlit is an interactive web framework that enables data scientists and developers to create and share data applications easily. The user can input a song of their choice, and based on the selected clustering model, the system will recommend a set of songs that share similar characteristics.
 
-The web application is hosted at the following link: Song Recommender Web App
+The web application is hosted at the following link: [Song Recommender Web App](https://song-recommender.streamlit.app)
 
 ## Usage
 
