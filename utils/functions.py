@@ -1,3 +1,5 @@
+import os
+import random
 import streamlit as st
 import pandas as pd
 import pickle
@@ -23,6 +25,32 @@ def read_pickle_file(path: str):
         file_read = pickle.load(file)
 
     return file_read
+
+
+def save_pickle_file(path: str, file_name: str, file_to_save):
+    '''
+
+    This function saves pickle files such as scalers, transformers, encoders or models 
+    to later retrieve them using the read_pickle_file function.
+    
+    Input:
+        path: path to save the file. If the directory doesn't exist, it will create one. i.e 'encoders/'
+        file_name: name of the pickle file. Must have .pkl extension. i.e encoder.pkl
+        file_to_save: the .pkl file to save
+    
+    Output:
+        It will save the file. If a directory is created it will notify via print.
+    
+    '''
+    # Check whether the specified path exists or not
+    isExist = os.path.exists(path)
+    if not isExist:
+      # Create a new directory because it does not exist
+      os.makedirs(path)
+      print("The new directory is created!")
+
+    with open(path + file_name, "wb") as file:
+        pickle.dump(file_to_save, file)
 
 
 def search_song(title: str, artist: str) -> list:
@@ -197,10 +225,20 @@ def convert_seconds_to_min_seconds(seconds):
     
     return f"{minutes:02d}:{seconds:02d}"
 
-def recommend_song(df: pd.DataFrame, selected_model: str, models, selected_features: list, track_id: str, min_popularity: int, max_popularity: int) -> list:
+def recommend_song(model_name, track_id: str, min_popularity: int, max_popularity: int) -> list:
     '''
     '''
-    
+
+    # Load data
+    df = pd.read_csv('./data/7_clustered_dataset.csv', sep=';')
+
+    # Define selected features
+    selected_features = ['energy','danceability','mode', 'speechiness', 
+                         'tempo', 'acousticness', 'instrumentalness', 'valence']
+
+    # Load model
+    model = read_pickle_file('./models/{}.pkl'.format(model_name))
+
     # Get if user song is hot
     is_hot = is_song_hot(df, track_id)
     
@@ -208,20 +246,21 @@ def recommend_song(df: pd.DataFrame, selected_model: str, models, selected_featu
     sp_song_audio_features = get_audio_features([track_id])[selected_features]
     
     # Work around while max retries ban
-    #sp_song_audio_features = df[df['track_id'] == track_id][selected_features]
-    
+    sp_song_audio_features = df[df['track_id'] == '59uQI0PADDKeE6UZDTJEe8'][selected_features]
+
     # Scale user selected song
     sp_song_audio_features_scaled = scale_user_song(sp_song_audio_features)
     
     # Predict cluster of user song
-    recommended_cluster = models[selected_model].predict(sp_song_audio_features_scaled)[:1].item()
+    recommended_cluster = model.predict(sp_song_audio_features_scaled)[:1].item()
     
     # Get a song from database using recommended cluster + is hot / not hot
-    recommended_songs = df[(df['clusters_{}'.format(selected_model)] == recommended_cluster) & 
-                          (df['is_hot'] == is_hot) & 
-                          (df['popularity'] >= min_popularity) &
-                          (df['popularity'] <= max_popularity)
-                         ]
+    recommended_songs = df[(df['clusters_{}'.format(model_name)] == recommended_cluster) & 
+                           (df['is_hot'] == is_hot) & 
+                           (df['popularity'] >= min_popularity) &
+                           (df['popularity'] <= max_popularity) &
+                           (df['track_id'] != track_id)
+                           ]
     min_results = 5
     # Check if df has a minimum of 5 songs
     if recommended_songs.shape[0] < min_results:
